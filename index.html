@@ -10,10 +10,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#f4f5f7">
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--ink:#16181d;--mute:#8a8f9a;--line:#e6e8ec;--acc:#3b5bfd;--accsoft:#e8ecff;--ok:#27a567;
+:root{--bg:#f4f5f7;--card:#fff;--ink:#16181d;--mute:#8a8f9a;--line:#e6e8ec;--acc:#7c4dff;--accsoft:#efe9ff;--ok:#27a567;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#7b93ff;--accsoft:#1f2640;--ok:#4cc88a}}
-:root[data-theme="dark"]{--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#7b93ff;--accsoft:#1f2640;--ok:#4cc88a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#a78bfa;--accsoft:#272040;--ok:#4cc88a}}
+:root[data-theme="dark"]{--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#a78bfa;--accsoft:#272040;--ok:#4cc88a}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;min-height:100vh}
@@ -99,9 +99,29 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 #ph img{display:block;width:100%;max-width:640px;margin:0 auto;border-radius:12px;background:#fff;cursor:zoom-in;transition:width .35s cubic-bezier(.2,.7,.2,1);animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
 #ph img.z{width:230%;max-width:none;margin:0;cursor:zoom-out}
 #ph .hint{text-align:center;color:#7c8291;font-size:12px;padding:8px 0 0}
+
+/* splash */
+#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));display:grid;place-items:center;color:#fff;animation:splashout .5s ease 1.6s forwards}
+@keyframes splashout{to{opacity:0;transform:scale(1.05);visibility:hidden}}
+.sp{text-align:center}
+.sp svg{width:104px;height:104px;animation:spin-in .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes spin-in{from{opacity:0;transform:scale(.4) rotate(-14deg)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sp .ln{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .5s ease forwards}
+.sp .l1{animation-delay:.55s}.sp .l2{animation-delay:.75s}.sp .l3{animation-delay:.95s}
+.spt{font-size:28px;font-weight:700;margin-top:20px;letter-spacing:-.02em;animation:rise .6s .3s both cubic-bezier(.2,.7,.2,1)}
+.spg{opacity:.75;margin-top:4px;font-size:14px;animation:rise .6s .45s both cubic-bezier(.2,.7,.2,1)}
+/* toast */
+#toast{white-space:pre-line;position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translate(-50%,-160%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:16px;font-size:14px;font-weight:600;z-index:40;max-width:min(92vw,440px);text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+#toast.on{transform:translate(-50%,0)}
 </style>
+<script>
+var ST={on:true,lead:5},ACC="#7c4dff";
+</script>
 </head>
 <body>
+<div id="splash"><div class="sp"><svg viewBox="0 0 100 100" fill="none"><rect x="14" y="20" width="72" height="68" rx="14" fill="#fff"/><rect x="30" y="8" width="8" height="22" rx="4" fill="#fff" stroke="rgba(0,0,0,.18)" stroke-width="2"/><rect x="62" y="8" width="8" height="22" rx="4" fill="#fff" stroke="rgba(0,0,0,.18)" stroke-width="2"/><g stroke="var(--acc)" stroke-width="6" stroke-linecap="round"><path class="ln l1" pathLength="1" d="M28 46H72"/><path class="ln l2" pathLength="1" d="M28 60H62"/><path class="ln l3" pathLength="1" d="M28 74H50"/></g></svg><div class="spt">Schedule</div><div class="spg">М1703-26(2б)</div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <div class="wrap">
   <div class="date" id="date"></div>
   <h1><span id="ttl">Schedule</span> <small id="clock"></small></h1>
@@ -184,14 +204,27 @@ function render(){
 $("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(b){sel=+b.dataset.d;animNext=true;render()}});
 $("theme").addEventListener("click",function(){var r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark";
   var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=dark?"#f4f5f7":"#0e1014"});
-// иконка для главного экрана
-try{var c=document.createElement("canvas");c.width=c.height=180;var g=c.getContext("2d");
-  g.fillStyle="#3b5bfd";g.fillRect(0,0,180,180);g.fillStyle="#fff";
-  g.beginPath();g.roundRect(40,50,100,90,16);g.fill();
-  g.fillStyle="#3b5bfd";g.fillRect(40,78,100,6);
-  g.fillStyle="#fff";g.fillRect(60,36,8,26);g.fillRect(112,36,8,26);
-  g.fillStyle="#3b5bfd";g.fillRect(58,98,64,8);g.fillRect(58,114,40,8);
-  var l=document.createElement("link");l.rel="apple-touch-icon";l.href=c.toDataURL("image/png");document.head.appendChild(l)}catch(e){}
+// home screen icon
+function shade(h,f){var n=parseInt(h.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return"rgb("+Math.round(r*f)+","+Math.round(g*f)+","+Math.round(b*f)+")"}
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+function makeIcon(size){var c=document.createElement("canvas");c.width=c.height=size;var g=c.getContext("2d"),k=size/180;
+  var gr=g.createLinearGradient(0,0,size,size);gr.addColorStop(0,ACC);gr.addColorStop(1,shade(ACC,.6));g.fillStyle=gr;g.fillRect(0,0,size,size);
+  g.fillStyle="#fff";rr(g,36*k,50*k,108*k,100*k,22*k);g.fill();
+  g.fillStyle=ACC;g.globalAlpha=.16;g.save();rr(g,36*k,50*k,108*k,100*k,22*k);g.clip();g.fillRect(36*k,50*k,108*k,28*k);g.restore();g.globalAlpha=1;
+  g.fillStyle="#fff";g.strokeStyle="rgba(0,0,0,.2)";g.lineWidth=2*k;
+  [58,108].forEach(function(x){rr(g,x*k,30*k,14*k,34*k,7*k);g.fill();g.stroke()});
+  g.fillStyle=ACC;rr(g,56*k,92*k,68*k,10*k,5*k);g.fill();rr(g,56*k,112*k,48*k,10*k,5*k);g.fill();rr(g,56*k,132*k,28*k,10*k,5*k);g.fill();
+  return c.toDataURL("image/png")}
+var _mu=null;
+function setIcon(){try{
+  var u=makeIcon(180),big=makeIcon(512);
+  function lk(rel){var l=document.querySelector('link[rel="'+rel+'"]');if(!l){l=document.createElement("link");l.rel=rel;document.head.appendChild(l)}return l}
+  lk("apple-touch-icon").href=u;var f=lk("icon");f.type="image/png";f.href=u;
+  var man={name:"Schedule М1703-26(2б)",short_name:"Schedule",display:"standalone",background_color:ACC,theme_color:ACC,icons:[{src:u,sizes:"180x180",type:"image/png"},{src:big,sizes:"512x512",type:"image/png",purpose:"any"}]};
+  if(/^https?:/.test(location.protocol))man.start_url=location.href;
+  var m=lk("manifest");if(_mu)URL.revokeObjectURL(_mu);_mu=URL.createObjectURL(new Blob([JSON.stringify(man)],{type:"application/manifest+json"}));m.href=_mu;
+}catch(e){}}
+setIcon();
 var T=[];try{T=JSON.parse(localStorage.getItem("tasks")||"[]")}catch(e){T=[]}
 function save(){try{localStorage.setItem("tasks",JSON.stringify(T))}catch(e){}}
 function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
@@ -222,7 +255,7 @@ $("nv1").addEventListener("click",function(){view(1)});
 $("nv2").addEventListener("click",function(){view(2)});
 var animNext=true,C={};C[P]=215;C[F]=270;C[G]=345;C[M]=160;C[S]=30;C[I]=195;
 function frac(d,cur,td,wd){if(td===0)return wd===6?1:0;if(d<td)return 1;if(d>td)return 0;var tot=0,dn=0;D[d].forEach(function(x){var s=mins(x.s),e=mins(x.e);tot+=e-s;dn+=Math.max(0,Math.min(cur,e)-s)});return dn/tot}
-function burst(el){if(!el||matchMedia("(prefers-reduced-motion:reduce)").matches)return;var r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,cols=["#3b5bfd","#27a567","#f5a524","#e5484d","#a259ff"];
+function burst(el){if(!el||matchMedia("(prefers-reduced-motion:reduce)").matches)return;var r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,cols=[ACC,"#27a567","#f5a524","#e5484d","#a259ff"];
   for(var i=0;i<24;i++){var p=document.createElement("i");p.style.cssText="position:fixed;z-index:9;pointer-events:none;width:7px;height:7px;border-radius:2px;left:"+cx+"px;top:"+cy+"px;background:"+cols[i%5];document.body.appendChild(p);var a=Math.random()*6.28,d=60+Math.random()*100;
   p.animate([{transform:"translate(0,0) scale(1)",opacity:1},{transform:"translate("+Math.cos(a)*d+"px,"+(Math.sin(a)*d+50)+"px) rotate("+Math.random()*540+"deg) scale(.4)",opacity:0}],{duration:800+Math.random()*400,easing:"cubic-bezier(.2,.7,.3,1)"}).onfinish=(function(q){return function(){q.remove()}})(p)}}
 function phOpen(o){$("ph").hidden=!o;document.body.style.overflow=o?"hidden":"";if(!o)$("pi").classList.remove("z")}
@@ -230,7 +263,41 @@ $("nv3").addEventListener("click",function(){phOpen(true)});
 $("phx").addEventListener("click",function(){phOpen(false)});
 $("pi").addEventListener("click",function(){this.classList.toggle("z")});
 document.addEventListener("keydown",function(e){if(e.key==="Escape")phOpen(false)});
-render();setInterval(render,20000);
+animNext=false;render();setInterval(render,20000);
+// toast + notifications (automatic, 5 min before class)
+var tt=null;
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},5000)}
+$("toast").addEventListener("click",function(){this.classList.remove("on")});
+var fired={};try{fired=JSON.parse(localStorage.getItem("fired")||"{}")}catch(e){}
+function askPerm(){if(typeof Notification!=="undefined"&&Notification.permission==="default"){try{var r=Notification.requestPermission();if(r&&r.then)r.catch(function(){})}catch(e){}}}
+askPerm();
+document.addEventListener("click",function once(){askPerm();document.removeEventListener("click",once)});
+function fire(x,diff){
+  var title="Next class in "+diff+" min",body=x.n+" · "+x.s+" · "+x.r;
+  if(typeof Notification!=="undefined"&&Notification.permission==="granted"){
+    try{new Notification(title,{body:body,icon:makeIcon(180),tag:"cls-"+x.s})}catch(e){}
+  }
+  if(navigator.vibrate)try{navigator.vibrate([120,60,120])}catch(e){}
+  toast(title+"\n"+body)}
+function check(){
+  if(!ST.on)return;var td=today();if(!td)return;
+  var now=new Date(),cur=now.getHours()*60+now.getMinutes()+now.getSeconds()/60,key=ymd(now),ls=D[td],ch=false;
+  for(var k in fired)if(k.indexOf(key)!==0){delete fired[k];ch=true}
+  for(var i=0;i<ls.length;i++){var x=ls[i],diff=mins(x.s)-cur,id=key+x.s;
+    if(diff>0&&diff<=ST.lead&&!fired[id]){
+      var pv=ls[i-1];
+      fired[id]=1;ch=true;
+      if(pv&&pv.n===x.n&&pv.r===x.r&&mins(x.s)-mins(pv.e)<=20)continue;
+      fire(x,Math.ceil(diff))}}
+  if(ch)try{localStorage.setItem("fired",JSON.stringify(fired))}catch(e){}}
+check();setInterval(check,15000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden){check();render()}});
+// splash
+(function(){var sp=$("splash"),rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function go(){animNext=true;render()}
+  if(rm){sp.remove();return}
+  setTimeout(go,1500);setTimeout(function(){sp.remove()},2200)})();
+
 </script>
 </body>
 </html>
