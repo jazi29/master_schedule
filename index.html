@@ -11,13 +11,14 @@
 <meta name="theme-color" content="#f4f5f7">
 <style>
 :root{--bg:#f4f5f7;--card:#fff;--ink:#16181d;--mute:#8a8f9a;--line:#e6e8ec;--acc:#7c4dff;--accsoft:#efe9ff;--ok:#27a567;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+box-sizing:border-box}
+html{background:var(--bg)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#a78bfa;--accsoft:#272040;--ok:#4cc88a}}
 :root[data-theme="dark"]{--bg:#0e1014;--card:#171a21;--ink:#f1f3f7;--mute:#7c8291;--line:#262a33;--acc:#a78bfa;--accsoft:#272040;--ok:#4cc88a}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;min-height:100vh}
-.wrap{max-width:480px;margin:0 auto;padding:22px 18px 40px}
+.wrap{max-width:480px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top,0px)) 18px 40px}
 .date{color:var(--mute);font-size:14px;font-weight:500}
 h1{margin:2px 0 0;font-size:30px;letter-spacing:-.03em;font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
 h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-variant-numeric:tabular-nums}
@@ -50,7 +51,7 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 .empty{padding:36px 20px;text-align:center;color:var(--mute)}
 .foot{text-align:center;color:var(--mute);font-size:12px;margin-top:22px}
 .foot button{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer}
-.wrap{padding-bottom:110px}
+.wrap{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:8px;padding:10px 18px calc(10px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);z-index:5}
 .nav button{flex:1;max-width:220px;border:0;background:transparent;color:var(--mute);font:600 14px inherit;font-family:inherit;padding:10px 0;border-radius:14px;cursor:pointer}
 .nav button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line)}
@@ -119,9 +120,9 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 .now .m{font-size:13px;margin-top:3px}
 .now .bar{margin-top:10px;height:5px}
 /* larger adaptive bottom bar and day tabs */
-.nav{gap:0;padding:0}
-.nav button{font-size:clamp(15px,4.4vw,17px);max-width:none;min-height:52px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));border-radius:0;box-shadow:none}
-.nav .ph{width:clamp(56px,16vw,64px);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
+.nav{gap:0;padding:0;background:var(--bg)}
+.nav button{font-size:clamp(15px,4.4vw,17px);max-width:none;min-height:46px;padding:10px 0 calc(6px + env(safe-area-inset-bottom,0px)*.35);border-radius:0;box-shadow:none}
+.nav .ph{width:clamp(56px,16vw,64px);padding:10px 0 calc(6px + env(safe-area-inset-bottom,0px)*.35)}
 .nav .ph svg{width:24px;height:24px}
 .tab{font-size:clamp(14px,4vw,16px)}
 .tab span{font-size:clamp(12px,3.3vw,13px)}
