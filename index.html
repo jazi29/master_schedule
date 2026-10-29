@@ -45,7 +45,6 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 .rm{font-size:13px;font-weight:600;background:var(--accsoft);color:var(--acc);padding:4px 9px;border-radius:9px;white-space:nowrap}
 .tag{display:inline-block;font-size:11px;font-weight:600;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-right:6px;vertical-align:1px}
 .row.done{opacity:.45}
-.row.done .nm{text-decoration:line-through;text-decoration-color:var(--mute)}
 .row.cur{background:var(--accsoft)}
 .row.cur .bar{margin-top:10px;height:4px}
 .empty{padding:36px 20px;text-align:center;color:var(--mute)}
@@ -100,7 +99,7 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 #ph img.z{width:230%;max-width:none;margin:0;cursor:zoom-out}
 #ph .hint{text-align:center;color:#7c8291;font-size:12px;padding:8px 0 0}
 /* splash */
-#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));display:grid;place-items:center;color:#fff;animation:splashout .5s ease 1.6s forwards}
+#splash{display:none;position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,var(--acc),color-mix(in srgb,var(--acc) 62%,#000));display:grid;place-items:center;color:#fff;animation:splashout .5s ease 1.6s forwards}
 @keyframes splashout{to{opacity:0;transform:scale(1.05);visibility:hidden}}
 .sp{text-align:center}
 .sp svg{width:104px;height:104px;animation:spin-in .8s cubic-bezier(.2,.8,.2,1) both}
@@ -120,9 +119,9 @@ h1 small{font-size:15px;font-weight:500;color:var(--mute);letter-spacing:0;font-
 .now .m{font-size:13px;margin-top:3px}
 .now .bar{margin-top:10px;height:5px}
 /* larger adaptive bottom bar and day tabs */
-.nav{gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
-.nav button{font-size:clamp(15px,4.4vw,17px);min-height:48px;padding:12px 0;border-radius:16px}
-.nav .ph{width:clamp(56px,16vw,64px)}
+.nav{gap:0;padding:0}
+.nav button{font-size:clamp(15px,4.4vw,17px);max-width:none;min-height:52px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));border-radius:0;box-shadow:none}
+.nav .ph{width:clamp(56px,16vw,64px);padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px))}
 .nav .ph svg{width:24px;height:24px}
 .tab{font-size:clamp(14px,4vw,16px)}
 .tab span{font-size:clamp(12px,3.3vw,13px)}
@@ -305,10 +304,9 @@ function check(){
 check();setInterval(check,15000);
 document.addEventListener("visibilitychange",function(){if(!document.hidden){check();render()}});
 // splash
-(function(){var sp=$("splash"),rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  function go(){animNext=true;render()}
-  if(rm){sp.remove();return}
-  setTimeout(go,1500);setTimeout(function(){sp.remove()},2200)})();
+(function(){var sp=$("splash");if(sp)sp.remove();animNext=true;render()})();
+// offline cache (works when the page is hosted next to sw.js over https)
+if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}}
 </script>
 </body>
 </html>
